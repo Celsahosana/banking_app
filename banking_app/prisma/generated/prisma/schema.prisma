@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  isActive  Boolean  @default(true)
+  password  String
+  Account   Account?
+}
+
+model Account {
+  id                                             String        @id
+  userId                                         String        @unique
+  balance                                        Int
+  createdAt                                      DateTime      @default(now())
+  User                                           User          @relation(fields: [userId], references: [id])
+  Transaction_Transaction_fromAccountIdToAccount Transaction[] @relation("Transaction_fromAccountIdToAccount")
+  Transaction_Transaction_toAccountIdToAccount   Transaction[] @relation("Transaction_toAccountIdToAccount")
+}
+
+model Transaction {
+  id                                         String          @id
+  fromAccountId                              String?
+  toAccountId                                String?
+  amount                                     Int
+  type                                       TransactionType
+  createdAt                                  DateTime        @default(now())
+  Account_Transaction_fromAccountIdToAccount Account?        @relation("Transaction_fromAccountIdToAccount", fields: [fromAccountId], references: [id])
+  Account_Transaction_toAccountIdToAccount   Account?        @relation("Transaction_toAccountIdToAccount", fields: [toAccountId], references: [id])
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  TRANSFER
+}
